@@ -90,6 +90,7 @@ namespace SubmarineAPI.Submarines.Controllers
             }
 
             _dataContext.Parts.Remove(part);
+            await _dataContext.SaveChangesAsync();
             
             return Ok(await _dataContext.Parts
                 .Select(x => new Part(x))
