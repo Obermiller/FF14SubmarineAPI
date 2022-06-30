@@ -1,100 +1,77 @@
-﻿using Data;
+﻿using Logic.Submarines.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using SubmarineAPI.Submarines.Models;
 
 namespace SubmarineAPI.Submarines.Controllers
 {
+    /// <summary>
+    /// Provide endpoints to users
+    /// </summary>
     [ApiController]
     [Route("api/[controller]")]
     public class PartController : ControllerBase
     {
-        private readonly DataContext _dataContext;
-        
-        public PartController(DataContext dataContext)
+        private readonly IPartLogic _partLogic;
+
+        public PartController(IPartLogic partLogic)
         {
-            _dataContext = dataContext;
+            _partLogic = partLogic;
         }
 
+        /// <summary>
+        /// Get all sub parts
+        /// </summary>
+        /// <returns>List of sub parts</returns>
         [HttpGet]
-        public async Task<ActionResult<List<Part>>> GetAll()
-            => Ok(await _dataContext.Parts
+        public ActionResult<List<Part>> GetAll()
+            => Ok(_partLogic.GetAll()
                 .Select(x => new Part(x))
-                .ToListAsync());
+                .ToList());
 
+        /// <summary>
+        /// Get a sub part by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>Specified sub part</returns>
         [HttpGet("{id}")]
-        public async Task<ActionResult<Part>> GetById(int id)
-            => await _dataContext.Parts.FindAsync(id) switch
+        public ActionResult<Part> GetById(int id)
+            => _partLogic.GetById(id) switch
             {
                 { } part => Ok(new Part(part)),
                 _ => BadRequest("Part not found.")
             };
 
+        /// <summary>
+        /// Add a new sub part
+        /// </summary>
+        /// <param name="part"></param>
+        /// <returns>List of sub parts after addition</returns>
         [HttpPost]
-        public async Task<ActionResult<List<Part>>> Add(Part part)
-        {
-            _dataContext.Parts.Add(part.MapToDb());
-            await _dataContext.SaveChangesAsync();
-            
-            return Ok(await _dataContext.Parts
-                .Select(x => new Part(x))
-                .ToListAsync());
-        }
+        public ActionResult<List<Part>> Insert(Part part)
+            => _partLogic.Upsert(part.MapToDb()) 
+                ? GetAll()
+                : BadRequest($"Error while inserting part with name: {part.Name}");
 
+        /// <summary>
+        /// Update an existing sub part
+        /// </summary>
+        /// <param name="part">Sub part</param>
+        /// <returns>List of sub parts after update</returns>
         [HttpPut]
-        public async Task<ActionResult<List<Part>>> Update(Part request)
-        {
-            if (await _dataContext.Parts.FindAsync(request.Id) is not { } part)
-            {
-                return BadRequest("Part not found");
-            }
+        public ActionResult<List<Part>> Update(Part part)
+            => _partLogic.Upsert(part.MapToDb()) 
+                ? GetAll()
+                : BadRequest($"Error while updating part with id: {part.Id}");
 
-            MapToDb();
-            
-            await _dataContext.SaveChangesAsync();
-
-            return Ok(await _dataContext.Parts
-                .Select(x => new Part(x))
-                .ToListAsync());
-
-            void MapToDb()
-            {
-                part.Name = request.Name;
-                part.Type = request.Type;
-                part.Description = request.Description;
-
-                part.Rank = request.Outfitting.Rank;
-                part.Components = request.Outfitting.Components;
-
-                part.Surveillance = request.Functionality.Surveillance;
-                part.Retrieval = request.Functionality.Retrieval;
-                part.Speed = request.Functionality.Speed;
-                part.Range = request.Functionality.Range;
-                part.Favor = request.Functionality.Favor;
-
-                part.Materials = request.CraftingAndRepairs.Materials;
-                part.Desynthesizable = request.CraftingAndRepairs.Desynthesizable;
-
-                part.ShopSellingPrice = request.ShopSellingPrice;
-                part.SellingPrice = request.SellingPrice;
-                part.MarketboardProhibited = request.MarketboardProhibited;
-            }
-        }
-
+        /// <summary>
+        /// Delete a sub part by idea
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>List of sub parts after deletion</returns>
         [HttpDelete("{id}")]
-        public async Task<ActionResult<List<Part>>> Delete(int id)
-        {
-            if (await _dataContext.Parts.FindAsync(id) is not { } part)
-            {
-                return BadRequest("Part not found");
-            }
-
-            _dataContext.Parts.Remove(part);
-            await _dataContext.SaveChangesAsync();
-            
-            return Ok(await _dataContext.Parts
-                .Select(x => new Part(x))
-                .ToListAsync());
-        }
+        public ActionResult<List<Part>> Delete(int id)
+            => _partLogic.Delete(id) 
+                ? GetAll() 
+                : BadRequest($"Error while deleting part with id: {id}");
     }
 }

@@ -11,3 +11,5 @@ build/
 bld/
 [Bb]in/
 [Oo]bj/
+
+*.user

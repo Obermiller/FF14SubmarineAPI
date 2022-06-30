@@ -29,4 +29,26 @@ public class Part
     public int ShopSellingPrice { get; set; }
     public int SellingPrice { get; set; }
     public bool MarketboardProhibited { get; set; }
+
+    public void Copy(Part part)
+    {
+        Name = part.Name;
+        Type = part.Type;
+        Description = part.Description;
+
+        Rank = part.Rank;
+        Components = part.Components;
+        Surveillance = part.Surveillance;
+        Retrieval = part.Retrieval;
+        Speed = part.Speed;
+        Range = part.Range;
+        Favor = part.Favor;
+
+        Materials = part.Materials;
+        Desynthesizable = part.Desynthesizable;
+
+        ShopSellingPrice = part.ShopSellingPrice;
+        SellingPrice = part.SellingPrice;
+        MarketboardProhibited = part.MarketboardProhibited;
+    }
 }

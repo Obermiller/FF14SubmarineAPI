@@ -1,4 +1,8 @@
 using Data;
+using Data.Repositories.Submarines;
+using Data.Repositories.Submarines.Interfaces;
+using Logic.Submarines;
+using Logic.Submarines.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +15,9 @@ builder.Services.AddDbContext<DataContext>(x =>
 {
     x.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+
+builder.Services.AddScoped<IPartLogic, PartLogic>();
+builder.Services.AddScoped<IPartRepository, PartRepository>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
