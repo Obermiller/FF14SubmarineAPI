@@ -31,16 +31,12 @@ public class SubmarineRepository : DataRepository, ISubmarineRepository
     /// Get all subs
     /// </summary>
     /// <returns>List of subs</returns>
-    public List<Submarine> GetAll()
-    {
-        var submarines = _dataContext.Submarines
+    public List<Submarine> GetAll() 
+        => _dataContext.Submarines
             .Include(s => s.Parts)
             .ThenInclude(sp => sp.Part)
             .ToList();
         
-        return submarines;
-    }
-
     /// <summary>
     /// Get a sub by id
     /// </summary>
