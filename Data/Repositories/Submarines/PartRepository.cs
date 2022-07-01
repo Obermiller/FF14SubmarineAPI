@@ -1,15 +1,17 @@
 ﻿using Core.Models.Submarines.Schema;
+using Data.Repositories.Submarines.Interfaces;
 
 namespace Data.Repositories.Submarines;
 
 /// <summary>
-/// Access DB
+/// Access DB for parts
 /// </summary>
-public class PartRepository : Interfaces.IPartRepository
+public class PartRepository : DataRepository, IPartRepository
 {
     private readonly DataContext _dataContext;
 
-    public PartRepository(DataContext dataContext)
+    public PartRepository(DataContext dataContext) 
+        :base(dataContext)
     {
         _dataContext = dataContext;
     }
@@ -21,7 +23,7 @@ public class PartRepository : Interfaces.IPartRepository
     public void Delete(Part part)
     {
         _dataContext.Parts.Remove(part);
-        _dataContext.SaveChanges();
+        SaveChanges();
     }
 
     /// <summary>
@@ -29,6 +31,16 @@ public class PartRepository : Interfaces.IPartRepository
     /// </summary>
     /// <returns>List of sub parts</returns>
     public List<Part> GetAll() => _dataContext.Parts.ToList();
+    
+    /// <summary>
+    /// Get sub parts by ids
+    /// </summary>
+    /// <param name="ids"></param>
+    /// <returns>Sub part if exists</returns>
+    public List<Part> GetByIds(IEnumerable<int> ids)
+        => _dataContext.Parts
+            .Where(p => ids.Contains(p.Id))
+            .ToList();
 
     /// <summary>
     /// Get a sub part by id
@@ -42,15 +54,9 @@ public class PartRepository : Interfaces.IPartRepository
     /// </summary>
     /// <param name="part"></param>
     public void Insert(Part part)
-    {
-        if (_dataContext.Parts.Find(part.Id) is { } dbPart)
-        {
-            dbPart.Copy(part);
-            _dataContext.Parts.Update(dbPart);
-        }
-
+    { 
         _dataContext.Parts.Add(part);
-        _dataContext.SaveChanges();
+        SaveChanges();
     }
     
     /// <summary>
@@ -60,6 +66,6 @@ public class PartRepository : Interfaces.IPartRepository
     public void Update(Part part)
     {
         _dataContext.Parts.Update(part);
-        _dataContext.SaveChanges();
+        SaveChanges();
     }
 }

@@ -1,4 +1,4 @@
-﻿using Core.Models.Submarines.Schema;
+﻿using Core.Models.Submarines.API;
 
 namespace Logic.Submarines.Interfaces;
 

@@ -30,6 +30,8 @@ public class Part
     public int SellingPrice { get; set; }
     public bool MarketboardProhibited { get; set; }
 
+    public List<SubmarinePart>? SubmarineParts { get; set; }
+
     public void Copy(Part part)
     {
         Name = part.Name;

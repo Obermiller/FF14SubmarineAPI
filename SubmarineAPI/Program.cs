@@ -11,13 +11,16 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
-builder.Services.AddDbContext<DataContext>(x =>
+builder.Services.AddDbContext<DataContext>(dc =>
 {
-    x.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+    dc.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
+//Implement reflection for these later
 builder.Services.AddScoped<IPartLogic, PartLogic>();
+builder.Services.AddScoped<ISubmarineLogic, SubmarineLogic>();
 builder.Services.AddScoped<IPartRepository, PartRepository>();
+builder.Services.AddScoped<ISubmarineRepository, SubmarineRepository>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
